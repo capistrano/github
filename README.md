@@ -1,6 +1,6 @@
 # Capistrano::Github
 
-In January 2014 Github Team [accounced Deployments API](http://developer.github.com/changes/2014-01-09-preview-the-new-deployments-api/) and you can use it with Capistrano 3.
+In January 2014 Github Team [announced Deployments API](http://developer.github.com/changes/2014-01-09-preview-the-new-deployments-api/) and you can use it with Capistrano 3.
 
 ## Installation
 
@@ -14,7 +14,7 @@ And then execute:
     $ bundle
 
 
-Declare `github_access_token` and require integration tasks:
+Require github tasks and set `github_access_token`:
 
 ```ruby
 # Capfile
@@ -26,15 +26,17 @@ require 'capistrano/github'
 set :github_access_token, '89c3be3d1f917b6ccf5e2c141dbc403f57bc140c'
 ```
 
-You can obtain your personal GH token [here](https://github.com/settings/applications)
+You can get your personal GH token [here](https://github.com/settings/applications)
 
 ## Usage
+
+New deployment record will be created automatically on each `cap deploy` run.
+
+To see the list of deployments, execute
 
 ```bash
 cap production github:deployments
 ```
-
-New deployment record will be created automatically on each `cap deploy` run.
 
 ## Contributing
 
