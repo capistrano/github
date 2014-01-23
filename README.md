@@ -6,7 +6,7 @@ In January 2014 Github Team [announced Deployments API](http://developer.github.
 
 Add this line to your application's Gemfile:
 
-    gem 'capistrano-github'
+    gem 'capistrano-github', github: 'capistrano/github'
     gem 'octokit', github: 'octokit/octokit.rb', branch: 'deployments-preview'
 
 And then execute:
