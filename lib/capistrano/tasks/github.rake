@@ -2,7 +2,7 @@ namespace :github do
 
   desc 'Notify Github about new deployment'
   task :create_deployment do
-    gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_accesss_token))
+    gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
 
     payload = {
       environment: fetch(:rails_env)
