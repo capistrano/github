@@ -16,10 +16,12 @@ namespace :github do
       gh = fetch(:github_deployment_api)
       payload = fetch(:github_deployment_payload)
 
-      set_if_empty :github_deployment, -> do
-        deployment = gh.create_deployment(fetch(:branch), force: true, payload: payload)
-        info("Created GitHub Deployment #{deployment.id}")
-        deployment
+      run_locally do
+        set_if_empty :github_deployment, -> do
+          deployment = gh.create_deployment(fetch(:branch), force: true, payload: payload)
+          info("Created GitHub Deployment #{deployment.id}")
+          deployment
+        end
       end
 
       fetch(:github_deployment)
@@ -28,11 +30,13 @@ namespace :github do
     [:pending, :success, :error, :failure].each do |status|
       desc "Mark current deployment as #{status}"
       task status => :create do
-        gh = fetch(:github_deployment_api)
-        dep = fetch(:github_deployment)
+        run_locally do
+          gh = fetch(:github_deployment_api)
+          dep = fetch(:github_deployment)
 
-        gh.create_deployment_status(dep.id, status)
-        info("Marked GitHub Deployment #{dep.id} as #{status}")
+          gh.create_deployment_status(dep.id, status)
+          info("Marked GitHub Deployment #{dep.id} as #{status}")
+        end
       end
     end
   end
