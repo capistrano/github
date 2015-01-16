@@ -4,7 +4,7 @@ module Capistrano
   module Github
     class API
       class Deployment
-        attr_accessor :created_at, :sha, :creator_login, :payload, :statuses, :id
+        attr_accessor :created_at, :ref, :sha, :creator_login, :payload, :statuses, :id, :environment
 
         class Status
           attr_accessor :created_at, :state
@@ -15,7 +15,7 @@ module Capistrano
 
       attr_reader :client
 
-      def initialize(full_repo_url, token)
+      def initialize(repo_url, token)
         @client = Octokit::Client.new(access_token: token)
         @repo = parse_repo_url(repo_url)
       end
@@ -28,14 +28,16 @@ module Capistrano
         @client.create_deployment_status(deployment_url(id), state)
       end
 
-      def deployments
-        @client.deployments(@repo).map do |d|
+      def deployments(options = {})
+        @client.deployments(@repo, options).map do |d|
           Deployment.new.tap do |dep|
             dep.created_at = d.created_at
             dep.sha = d.sha
+            dep.ref = d.ref
             dep.creator_login = d.creator.login
             dep.payload = d.payload
             dep.id = d.id
+            dep.environment = d.environment
 
             dep.statuses = deployment_statuses(d.id)
           end

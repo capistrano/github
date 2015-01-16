@@ -1,12 +1,13 @@
 set_if_empty :github_deployment_payload, -> do
   {
-      environment: fetch(:rails_env)
+
   }
 end
 
 set_if_empty :github_deployment, -> do
   {
-      auto_merge: false
+      auto_merge: false,
+      environment: fetch(:rails_env)
   }
 end
 
@@ -26,9 +27,9 @@ namespace :github do
 
       run_locally do
         set_if_empty :current_github_deployment, -> do
-          gh.create_deployment(branch, config).tap do |dep|
-            info("Created GitHub Deployment #{dep.id}")
-          end
+          deployment = gh.create_deployment(branch, config)
+          info("Created GitHub Deployment #{deployment.id}")
+          deployment
         end
       end
 
@@ -52,11 +53,13 @@ namespace :github do
   desc 'List Github deployments'
   task :deployments do
     gh = fetch(:github_deployment_api)
-    gh.deployments.each do |d|
-      puts "Deployment: #{d.created_at} #{d.sha} by @#{d.creator_login} #{d.payload.inspect}"
+    env = fetch(:github_deployment)[:environment]
+    gh.deployments(environment: env).each do |d|
+      statuses = d.statuses.reverse
+      puts "Deployment (#{statuses.last.state}): #{d.created_at} #{d.ref}@#{d.sha} to #{d.environment} by @#{d.creator_login} "
 
-      d.statuses.each do |s|
-        puts "#{s.created_at} state: #{s.state}"
+      statuses.each do |s|
+        puts "\t#{s.created_at} state: #{s.state}"
       end
     end
   end
