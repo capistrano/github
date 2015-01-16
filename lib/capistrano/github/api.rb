@@ -24,7 +24,7 @@ module Capistrano
         @client.create_deployment(@repo, branch, options)
       end
 
-      def create_deployment_status(id, state, target)
+      def create_deployment_status(id, state)
         @client.create_deployment_status(deployment_url(id), state)
       end
 
