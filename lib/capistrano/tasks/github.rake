@@ -1,3 +1,5 @@
+require 'capistrano/github/api'
+
 set_if_empty :github_deployment_payload, -> do
   {
 
@@ -7,7 +9,7 @@ end
 set_if_empty :github_deployment, -> do
   {
       auto_merge: false,
-      environment: fetch(:rails_env)
+      environment: fetch(:stage)
   }
 end
 
@@ -15,36 +17,50 @@ set_if_empty :github_deployment_api, -> do
   Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
 end
 
+set :github_deployment_required, false
+
+set :github_deployment_enabled, -> do
+  begin
+    fetch(:github_deployment_api)
+  rescue Capistrano::Github::API::MissingAccessToken
+    false
+  end
+end
+
+set :github_deployment_skip, -> do
+  !fetch(:github_deployment_enabled) && !fetch(:github_deployment_required)
+end
+
 namespace :github do
 
   namespace :deployment do
     desc 'Create new deployment'
     task :create do
+      next if fetch(:github_deployment_skip)
+
       gh = fetch(:github_deployment_api)
       payload = fetch(:github_deployment_payload)
       config = fetch(:github_deployment).merge(payload: payload)
       branch = fetch(:branch)
 
-      run_locally do
-        set_if_empty :current_github_deployment, -> do
-          deployment = gh.create_deployment(branch, config)
-          info("Created GitHub Deployment #{deployment.id}")
-          deployment
-        end
-      end
+      set :current_github_deployment, deployment = gh.create_deployment(branch, config)
 
-      fetch(:current_github_deployment)
+      run_locally do
+        info("Created GitHub Deployment #{deployment}")
+      end
     end
 
     [:pending, :success, :error, :failure].each do |status|
       desc "Mark current deployment as #{status}"
-      task status => :create do
-        run_locally do
-          gh = fetch(:github_deployment_api)
-          dep = fetch(:current_github_deployment)
+      task status => 'github:deployment:create' do
+        next if fetch(:github_deployment_skip)
 
-          gh.create_deployment_status(dep.id, status)
-          info("Marked GitHub Deployment #{dep.id} as #{status}")
+        gh = fetch(:github_deployment_api)
+        deployment = fetch(:current_github_deployment)
+
+        run_locally do
+          gh.create_deployment_status(deployment, status)
+          info("Marked GitHub Deployment #{deployment} as #{status}")
         end
       end
     end

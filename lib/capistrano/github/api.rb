@@ -16,12 +16,13 @@ module Capistrano
       attr_reader :client
 
       def initialize(repo_url, token)
+        raise MissingAccessToken unless token
         @client = Octokit::Client.new(access_token: token)
         @repo = parse_repo_url(repo_url)
       end
 
       def create_deployment(branch, options = {})
-        @client.create_deployment(@repo, branch, options)
+        @client.create_deployment(@repo, branch, options).id
       end
 
       def create_deployment_status(id, state)
@@ -55,9 +56,12 @@ module Capistrano
       end
 
       def parse_repo_url(url)
-        repo_match = url.match(REPO_FORMAT)
+        repo_match = url && url.match(REPO_FORMAT) or raise InvalidRepoUrl, url
         "#{repo_match[1]}/#{repo_match[2]}"
       end
+
+      InvalidRepoUrl = Class.new(StandardError)
+      MissingAccessToken = Class.new(StandardError)
     end
   end
 end

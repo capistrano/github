@@ -6,8 +6,8 @@ require 'capistrano/github/version'
 Gem::Specification.new do |spec|
   spec.name          = "capistrano-github"
   spec.version       = Capistrano::Github::VERSION
-  spec.authors       = ["Kir Shatrov"]
-  spec.email         = ["shatrov@me.com"]
+  spec.authors       = ["Kir Shatrov", 'Michal Cichra']
+  spec.email         = ["shatrov@me.com", 'michal@3scale.net']
   spec.summary       = %q{Integrates Capistrano with Github Deployments API}
   spec.homepage      = "http://github.com/capistrano/github"
   spec.license       = "MIT"
@@ -22,4 +22,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec", '~> 3.1'
 end
