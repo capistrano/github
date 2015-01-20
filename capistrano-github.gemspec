@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Kir Shatrov", 'Michal Cichra']
   spec.email         = ["shatrov@me.com", 'michal@3scale.net']
   spec.summary       = %q{Integrates Capistrano with Github Deployments API}
-  spec.homepage      = "http://github.com/capistrano/github"
+  spec.homepage      = "http://github.com/3scale/capistrano-github"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
