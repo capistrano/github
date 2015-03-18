@@ -59,8 +59,12 @@ namespace :github do
         deployment = fetch(:current_github_deployment)
 
         run_locally do
-          gh.create_deployment_status(deployment, status)
-          info("Marked GitHub Deployment #{deployment} as #{status}")
+          if deployment
+            gh.create_deployment_status(deployment, status)
+            info("Marked GitHub Deployment #{deployment} as #{status}")
+          else
+            info("No GitHub Deployment found, could not mark as #{status}")
+          end
         end
       end
     end
