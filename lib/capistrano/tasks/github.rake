@@ -10,8 +10,10 @@ namespace :github do
       auto_merge: false
     })
 
+    set :dep_id, dep.id
+
     target = "http://#{primary(:app).hostname}"
-    gh.create_deployment_status(dep.id, :pending, target)
+    gh.create_deployment_status(fetch(:dep_id), :pending, target)
   end
 
   desc 'List Github deployments'
@@ -31,7 +33,7 @@ namespace :github do
     gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
 
     target = primary(:app).hostname
-    gh.create_deployment_status(dep.id, :success, target)
+    gh.create_deployment_status(fetch(:dep_id), :success, target)
   end
 
   desc 'Fail Github deployment'
@@ -39,7 +41,7 @@ namespace :github do
     gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
 
     target = primary(:app).hostname
-    gh.create_deployment_status(dep.id, :failure, target)
+    gh.create_deployment_status(fetch(:dep_id), :failure, target)
   end
 
   before 'deploy:starting', 'github:create_deployment'
