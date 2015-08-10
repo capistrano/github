@@ -4,11 +4,11 @@ namespace :github do
   task :create_deployment do
     gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
 
-    payload = {
-      environment: fetch(:rails_env)
-    }
-
-    dep = gh.create_deployment(fetch(:branch), force: true, payload: payload)
+    dep = gh.create_deployment(fetch(:branch), {
+      environment: fetch(:stage),
+      required_contexts: [], # force deploy
+      auto_merge: false
+    })
 
     target = "http://#{primary(:app).hostname}"
     gh.create_deployment_status(dep.id, :pending, target)
