@@ -42,4 +42,10 @@ namespace :github do
     gh.create_deployment_status(dep.id, :failure, target)
   end
 
+  before 'deploy:starting', 'github:create_deployment'
+  after 'deploy:finished', 'github:finish_deployment'
+  if Rake::Task.task_defined? 'deploy:failed'
+    after 'deploy:failed', 'github:fail_deployment'
+  end
+
 end
