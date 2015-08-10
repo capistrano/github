@@ -28,10 +28,18 @@ namespace :github do
 
   desc 'Finish Github deployment'
   task :finish_deployment do
-    gh = Capistrano::Github::API.new(fetch(:repo_url))
+    gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
 
     target = primary(:app).hostname
-    gh.create_deployment_status(dep.id, :failed, target)
+    gh.create_deployment_status(dep.id, :success, target)
+  end
+
+  desc 'Fail Github deployment'
+  task :fail_deployment do
+    gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
+
+    target = primary(:app).hostname
+    gh.create_deployment_status(dep.id, :failure, target)
   end
 
 end
