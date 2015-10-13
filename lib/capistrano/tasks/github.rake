@@ -76,7 +76,8 @@ namespace :github do
     env = fetch(:github_deployment)[:environment]
     gh.deployments(environment: env).each do |d|
       statuses = d.statuses.reverse
-      puts "Deployment (#{statuses.last.state}): #{d.created_at} #{d.ref}@#{d.sha} to #{d.environment} by @#{d.creator_login} "
+      last_state = statuses.empty? ? 'unknown' : statuses.last.state
+      puts "Deployment (#{last_state}): #{d.created_at} #{d.ref}@#{d.sha} to #{d.environment} by @#{d.creator_login}"
 
       statuses.each do |s|
         puts "\t#{s.created_at} state: #{s.state}"
