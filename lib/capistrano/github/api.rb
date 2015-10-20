@@ -4,7 +4,15 @@ module Capistrano
   module Github
     class API
       class Deployment
-        attr_accessor :created_at, :ref, :sha, :creator_login, :payload, :statuses, :id, :environment
+        attr_accessor :created_at, :ref, :sha, :creator_login, :payload, :statuses_proc, :id, :environment
+
+        def statuses
+          @statuses ||= statuses_proc.call
+        end
+
+        def last_state
+          @last_state ||= statuses.map(&:state).first || 'unknown'
+        end
 
         class Status
           attr_accessor :created_at, :state
@@ -40,7 +48,7 @@ module Capistrano
             dep.id = d.id
             dep.environment = d.environment
 
-            dep.statuses = deployment_statuses(d.id)
+            dep.statuses_proc = -> { deployment_statuses(d.id) }
           end
         end
       end

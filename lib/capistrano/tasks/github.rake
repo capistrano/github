@@ -70,18 +70,16 @@ namespace :github do
     end
   end
 
+  print_deployment = -> d { puts "Deployment (#{d.last_state}): #{d.created_at} #{d.ref}@#{d.sha} to #{d.environment} by @#{d.creator_login}" }
+  print_status = -> s { puts "\t#{s.created_at} state: #{s.state}" }
+
   desc 'List Github deployments'
   task :deployments do
     gh = fetch(:github_deployment_api)
     env = fetch(:github_deployment)[:environment]
-    gh.deployments(environment: env).each do |d|
-      statuses = d.statuses.reverse
-      last_state = statuses.empty? ? 'unknown' : statuses.last.state
-      puts "Deployment (#{last_state}): #{d.created_at} #{d.ref}@#{d.sha} to #{d.environment} by @#{d.creator_login}"
-
-      statuses.each do |s|
-        puts "\t#{s.created_at} state: #{s.state}"
-      end
+    gh.deployments(environment: env).each do |deployment|
+      deployment.tap(&print_deployment)
+      deployment.statuses.each(&print_status)
     end
   end
 end
