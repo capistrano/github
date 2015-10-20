@@ -82,4 +82,11 @@ namespace :github do
       deployment.statuses.each(&print_status)
     end
   end
+
+  desc 'Show last Github deploy'
+  task :last_deploy do
+    gh = fetch(:github_deployment_api)
+    env = fetch(:github_deployment)[:environment]
+    gh.deployments(environment: env).first.tap(&print_deployment)
+  end
 end
