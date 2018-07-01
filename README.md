@@ -1,3 +1,7 @@
+# This project is now [being maintained by @3scale](https://github.com/3scale/capistrano-github).
+
+*Old Readme:*
+
 # Capistrano::Github
 
 In January 2014 Github Team [announced Deployments API](http://developer.github.com/changes/2014-01-09-preview-the-new-deployments-api/) and you can use it with Capistrano 3.
