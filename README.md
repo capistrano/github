@@ -10,8 +10,7 @@ In January 2014 Github Team [announced Deployments API](http://developer.github.
 
 Add this line to your application's Gemfile:
 
-    gem 'capistrano-github', github: 'capistrano/github'
-    gem 'octokit', github: 'octokit/octokit.rb', branch: 'deployments-preview'
+    gem 'capistrano-github', github: '3scale/capistrano-github'
 
 And then execute:
 
@@ -28,6 +27,12 @@ require 'capistrano/github'
 ```ruby
 # deploy.rb
 set :github_access_token, '89c3be3d1f917b6ccf5e2c141dbc403f57bc140c'
+
+
+before 'deploy:starting', 'github:deployment:create'
+after  'deploy:starting', 'github:deployment:pending'
+after  'deploy:finished', 'github:deployment:success'
+after  'deploy:failed',   'github:deployment:failure'
 ```
 
 You can get your personal GH token [here](https://github.com/settings/applications)
@@ -44,7 +49,7 @@ cap production github:deployments
 
 ## Contributing
 
-1. Fork it ( http://github.com/<my-github-username>/capistrano-github/fork )
+1. Fork it ( http://github.com/3scale/capistrano-github/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
