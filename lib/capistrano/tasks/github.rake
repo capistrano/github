@@ -4,14 +4,16 @@ namespace :github do
   task :create_deployment do
     gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
 
-    payload = {
-      environment: fetch(:rails_env)
-    }
+    dep = gh.create_deployment(fetch(:branch), {
+      environment: fetch(:stage),
+      required_contexts: [], # force deploy
+      auto_merge: false
+    })
 
-    dep = gh.create_deployment(fetch(:branch), force: true, payload: payload)
+    set :dep_id, dep.id
 
     target = "http://#{primary(:app).hostname}"
-    gh.create_deployment_status(dep.id, :pending, target)
+    gh.create_deployment_status(fetch(:dep_id), :pending, target)
   end
 
   desc 'List Github deployments'
@@ -28,10 +30,24 @@ namespace :github do
 
   desc 'Finish Github deployment'
   task :finish_deployment do
-    gh = Capistrano::Github::API.new(fetch(:repo_url))
+    gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
 
     target = primary(:app).hostname
-    gh.create_deployment_status(dep.id, :failed, target)
+    gh.create_deployment_status(fetch(:dep_id), :success, target)
+  end
+
+  desc 'Fail Github deployment'
+  task :fail_deployment do
+    gh = Capistrano::Github::API.new(fetch(:repo_url), fetch(:github_access_token))
+
+    target = primary(:app).hostname
+    gh.create_deployment_status(fetch(:dep_id), :failure, target)
+  end
+
+  before 'deploy:starting', 'github:create_deployment'
+  after 'deploy:finished', 'github:finish_deployment'
+  if Rake::Task.task_defined? 'deploy:failed'
+    after 'deploy:failed', 'github:fail_deployment'
   end
 
 end
